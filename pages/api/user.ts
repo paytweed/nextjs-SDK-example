@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import tweedService from "@/services/tweed.service";
 import { authService } from "@/services";
 
 export default async function handler(

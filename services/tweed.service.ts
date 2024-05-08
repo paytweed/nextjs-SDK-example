@@ -2,26 +2,24 @@ import { TweedBackendSDK } from "@paytweed/backend-sdk";
 import nftService from "./nft.service";
 import tokenService from "./token.service";
 
-type AsyncReturnType<T> = T extends (...args: any[]) => Promise<infer R>
-  ? R
-  : never;
+const TWEED_API_KEY = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+const TWEED_API_SECRET =
+  "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 
-class TweedService {
-  private _client: AsyncReturnType<typeof TweedBackendSDK.setup> | undefined =
-    undefined;
-  async initialize() {
-    this._client = await TweedBackendSDK.setup({
-      apiKey: "15cVDEv7E9saty6TRjmVoel78ibLXmdc",
-      apiSecret: "7NqjB6yVfULNDx-3Y06H5T51WQN7DSPvAA7c5pOIiU-oN9kxR1a5xpaOaM4PmYn1",
-      defaultBlockchainIds: ["ethereumSepolia"],
-      callbacks: {
-        getNftPurchaseData: async ({ nftId }) => nftService.getById(nftId),
-        getTokenPurchaseData: async ({ tokenId }) =>
-          tokenService.getById(tokenId),
-      },
-    });
-    return this._client;
-  }
-}
+let _client: Awaited<ReturnType<typeof TweedBackendSDK.setup>> | null = null;
 
-export default new TweedService();
+export const getTweedSDK = async () => {
+  if (_client) return _client;
+
+  _client = await TweedBackendSDK.setup({
+    apiKey: TWEED_API_KEY,
+    apiSecret: TWEED_API_SECRET,
+    defaultBlockchainIds: ["ethereumSepolia"],
+    callbacks: {
+      getNftPurchaseData: async ({ nftId }) => nftService.getById(nftId),
+      getTokenPurchaseData: async ({ tokenId }) =>
+        tokenService.getById(tokenId),
+    },
+  });
+  return _client;
+};
